@@ -32,6 +32,77 @@
 
 		<script>
 			$(function() {
+				var Q = Quintus({
+					development:false
+					});
+					Q.include("Sprites,Scenes,Input,UI,Touch,2D");
+					Q.setup("juego",{
+						maximize:true
+					});
+					Q.controls();
+					Q.touch();
+					
+					Q.load("escenario.tmx,player.png,tiles_map.png",function(){
+						Q.sheet("mosaicos","tiles_map.png",{
+							tileh:70,
+							tilew:70
+						});
+						Q.stageScene("nivel1");
+						
+					});
+					Q.scene("nivel1",function(stage){
+						var fondo = new Q.TileLayer({
+							dataAsset:"escenario.tmx",
+							sheet:"mosaicos",
+							tileH:70,
+							tileW:70,
+							layerIndex:0,
+							type:Q.SPRITE_NONE
+						});
+						stage.insert(fondo);
+						
+						var colisiones = new Q.TileLayer({
+							dataAsset:"escenario.tmx",
+							sheet:"mosaicos",
+							tileH:70,
+							tileW:70,
+							layerIndex:1,
+						});
+						stage.collisionLayer(colisiones);
+						
+						Q.Sprite.extend("Jugador",{
+							init:function(p){
+								this._super(p,{
+									asset:"player.png",
+									x:110,
+									y:50,
+									jumpSpeed:-380
+								});
+								this.add("2d,platformerControls");
+								
+							},
+							step:function(){
+								if(Q.inputs["left"]){
+									this.p.flip = "x";
+								}
+								if(Q.inputs["right"]){
+									this.p.flip = false;
+								}
+							}
+						});
+						var jugador = stage.insert(new Q.Jugador());
+						stage.add("viewport").follow(jugador,{
+							x:true,
+							y:true
+						},{
+							minX:0,
+							maxX:fondo.p.w,
+							minY:0,
+							maxY:fondo.p.h
+						});
+						
+					});
+				
 
 			});
 		</script>
